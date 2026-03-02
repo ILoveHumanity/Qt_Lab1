@@ -8,6 +8,11 @@ EncDec::~EncDec()
 {
 
 }
+EncDec& EncDec::getInstance() {
+    static EncDec s;
+    return s;
+}
+
 void EncDec::print_all_in_dir(const QString &path)
 {
     QDir dir(path);

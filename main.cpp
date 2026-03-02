@@ -7,10 +7,10 @@ int main(int argc, char *argv[])
     QString path;
     QTextStream in(stdin);
     QTextStream out(stdout);
-    out << "Enter path: " << Qt::flush;
-    in >> path;
-    EncDec a;
-    a.print_all_in_dir(path);
+    out << "Enter path: " << Qt::endl;
+    path = in.readLine();
+    EncDec& EncDec_Instance = EncDec::getInstance();
+    EncDec_Instance.print_all_in_dir(path);
 
     return 0;
     //return a.exec();
