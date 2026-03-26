@@ -6,6 +6,7 @@
 #include <QString>
 #include <qDebug>
 #include <QFileInfo>
+#include <openssl/aes.h>
 
 class EncDec
 {
