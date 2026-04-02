@@ -1,15 +1,15 @@
 #include "encdec.h"
 
-EncDec::EncDec()
+EncDec::EncDec(ICypherMetod* cypher_)
 {
-
+    cypher = cypher_;
 }
 EncDec::~EncDec()
 {
 
 }
-EncDec& EncDec::getInstance() {
-    static EncDec s;
+EncDec& EncDec::getInstance(ICypherMetod* cypher_) {
+    static EncDec s(cypher_);
     return s;
 }
 
