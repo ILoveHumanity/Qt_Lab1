@@ -1,6 +1,6 @@
 #include <QCoreApplication>
 #include <EncDec.h>
-#include <openssl/err.h>
+
 #include <openssl/rand.h>
 #include <openssl/opensslv.h>
 
