@@ -17,3 +17,13 @@ else: unix:!android: target.path = /opt/$${TARGET}/bin
 
 HEADERS += \
     EncDec.h
+
+LIBS += \
+    -LC:/Qt/Tools/mingw810_64/opt/lib/ -lcrypto -lssl \
+    -LC:/Qt/Tools/mingw810_64/opt/bin/ -leay32
+
+INCLUDEPATH += \
+    C:/Qt/Tools/mingw810_64/opt/include
+
+DISTFILES +=
+
