@@ -8,8 +8,8 @@ class AESForFile : public ICypherMetod
 public:
     AESForFile();
     ~AESForFile();
-    bool encryptFileWithPass(QString& pathToFile, QString& password) = 0;
-    bool decryptFileWithPass(QString& pathToFile, QString& password) = 0;
+    bool encryptFileWithPass(const QString& pathToFile, const QString& password);
+    bool decryptFileWithPass(const QString& pathToFile, const QString& password);
 };
 
 #endif // AESFORFILE_H
