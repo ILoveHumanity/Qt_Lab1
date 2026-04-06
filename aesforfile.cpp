@@ -22,7 +22,7 @@ AESForFile::~AESForFile()
 {
 
 }
-bool encryptFileWithPass(const QString& pathToFile, const QString& password)
+bool AESForFile::encryptFileWithPass(const QString& pathToFile, const QString& password)
 {
     QFile inputFile(pathToFile);
 
@@ -155,7 +155,7 @@ bool encryptFileWithPass(const QString& pathToFile, const QString& password)
     EVP_CIPHER_CTX_free(cipherContext);
     return true;
 }
-bool decryptFileWithPass(QString& pathToFile, QString& password)
+bool AESForFile::decryptFileWithPass(const QString& pathToFile, const QString& password)
 {
     return true;
 }

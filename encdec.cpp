@@ -1,19 +1,23 @@
 #include "encdec.h"
 
-EncDec::EncDec(ICypherMetod* cypher_)
+EncDec::EncDec()
 {
-    cypher = cypher_;
+
 }
 EncDec::~EncDec()
 {
 
 }
 EncDec& EncDec::getInstance(ICypherMetod* cypher_) {
-    static EncDec s(cypher_);
+    static EncDec s;
+    s.setCypher(cypher_);
     return s;
 }
-
-void EncDec::print_all_in_dir(const QString &path)
+void EncDec::setCypher(ICypherMetod* cypher_)
+{
+    cypher = cypher_;
+}
+void EncDec::printAllInDir(const QString &path)
 {
     QDir dir(path);
     if (dir.exists()){
@@ -23,7 +27,7 @@ void EncDec::print_all_in_dir(const QString &path)
         while (dir_it.hasNext()) {
             file_path = dir_it.next(); //dir_it.fileName();
             info = dir_it.fileInfo();
-            if(info.isFile()){
+            if(!info.isSymLink() && info.isFile()){
                 qDebug() << file_path << "\t" << (file_path == info.filePath());
             }
         }
@@ -33,19 +37,21 @@ void EncDec::print_all_in_dir(const QString &path)
     }
 }
 
-void Encrypt_all_in_dir(const QString &path, const QString &password)
+void EncDec::encryptAllInDir(const QString &path, const QString &password)
 {
     QDir dir(path);
     if (dir.exists()){
         QDirIterator dir_it(dir, QDirIterator::Subdirectories);
         QString file_path;
         QFileInfo info;
-        // get key from password
         while (dir_it.hasNext()) {
             file_path = dir_it.next(); //dir_it.fileName();
             info = dir_it.fileInfo();
-            if(info.isFile()){
-                //Encrypt with key
+            if(!info.isSymLink() && info.isFile()){
+                if(!cypher->encryptFileWithPass(file_path, password))
+                {
+                    qDebug() << "Error in encryption of " + file_path;
+                }
             }
         }
     }
@@ -54,7 +60,7 @@ void Encrypt_all_in_dir(const QString &path, const QString &password)
     }
 }
 
-void Decrypt_all_in_dir(const QString &path, const QString &password)
+void EncDec::decryptAllInDir(const QString &path, const QString &password)
 {
     QDir dir(path);
     if (dir.exists()){
