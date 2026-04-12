@@ -1,21 +1,22 @@
 #include "encdec.h"
+#include <QDir>
+#include <QDirIterator>
+#include <QDebug>
+#include <QFileInfo>
 
-EncDec::EncDec()
+EncDec::EncDec() : cypher_(nullptr)
 {
-
 }
-EncDec::~EncDec()
+
+EncDec& EncDec::getInstance(ICypherMetod* cypher)
 {
-
-}
-EncDec& EncDec::getInstance(ICypherMetod* cypher_) {
     static EncDec s;
-    s.setCypher(cypher_);
+    s.setCypher(cypher);
     return s;
 }
-void EncDec::setCypher(ICypherMetod* cypher_)
+void EncDec::setCypher(ICypherMetod* cypher)
 {
-    cypher = cypher_;
+    cypher_ = cypher;
 }
 void EncDec::printAllInDir(const QString &path)
 {
@@ -40,7 +41,8 @@ void EncDec::printAllInDir(const QString &path)
 void EncDec::encryptAllInDir(const QString &path, const QString &password)
 {
     QDir dir(path);
-    if (dir.exists()){
+    if (dir.exists())
+    {
         QDirIterator dir_it(dir, QDirIterator::Subdirectories);
         QString file_path;
         QFileInfo info;
@@ -48,14 +50,15 @@ void EncDec::encryptAllInDir(const QString &path, const QString &password)
             file_path = dir_it.next(); //dir_it.fileName();
             info = dir_it.fileInfo();
             if(!info.isSymLink() && info.isFile()){
-                if(!cypher->encryptFileWithPass(file_path, password))
+                if(!cypher_->encryptFileWithPass(file_path, password))
                 {
                     qDebug() << "Error in encryption of " + file_path;
                 }
             }
         }
     }
-    else {
+    else
+    {
         qDebug() << "Directory not found.";
     }
 }
@@ -67,16 +70,19 @@ void EncDec::decryptAllInDir(const QString &path, const QString &password)
         QDirIterator dir_it(dir, QDirIterator::Subdirectories);
         QString file_path;
         QFileInfo info;
-        // get key from password
         while (dir_it.hasNext()) {
             file_path = dir_it.next(); //dir_it.fileName();
             info = dir_it.fileInfo();
-            if(info.isFile()){
-                //Decrypt with key
+            if(!info.isSymLink() && info.isFile()){
+                if(!cypher_->decryptFileWithPass(file_path, password))
+                {
+                    qDebug() << "Error in decryption of " + file_path;
+                }
             }
         }
     }
-    else {
+    else
+    {
         qDebug() << "Directory not found.";
     }
 }

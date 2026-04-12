@@ -6,8 +6,8 @@
 class AESForFile : public ICypherMetod
 {
 public:
-    AESForFile();
-    ~AESForFile();
+    AESForFile() = default;
+    ~AESForFile() = default;
     bool encryptFileWithPass(const QString& pathToFile, const QString& password);
     bool decryptFileWithPass(const QString& pathToFile, const QString& password);
 };
