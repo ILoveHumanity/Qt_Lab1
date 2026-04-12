@@ -2,8 +2,6 @@
 #define ICYPHERMETOD_H
 #pragma once
 
-#include <QFileInfo>
-#include <QVector>
 #include <QString>
 
 class ICypherMetod

@@ -1,11 +1,13 @@
 #include "aesforfile.h"
+
 #include <openssl/crypto.h>
 #include <openssl/evp.h>
 #include <openssl/rand.h>
-#include <openssl/err.h>
-#include <QSaveFile>
+
 #include <QFile>
-#include <qDebug>
+#include <QSaveFile>
+#include <QByteArray>
+#include <QDebug>
 
 QByteArray EncryptedFlag = "727780ee7239ad2c3fbf50969a64f852"; // EncryptedFlag на EncryptedFlag с помощью MD5
 int saltSize = 16;
@@ -14,14 +16,6 @@ int iterationCount = 10000;
 int IVSize = 16;
 int tagSize = 16;
 
-AESForFile::AESForFile()
-{
-
-}
-AESForFile::~AESForFile()
-{
-
-}
 bool AESForFile::encryptFileWithPass(const QString& pathToFile, const QString& password)
 {
     QFile inputFile(pathToFile);
@@ -31,7 +25,7 @@ bool AESForFile::encryptFileWithPass(const QString& pathToFile, const QString& p
         qDebug() << "Failed to open input file: " << pathToFile;
         return false;
     }
-    const QByteArray fileContent = inputFile.readAll();
+    QByteArray fileContent = inputFile.readAll();
     if (inputFile.error() == QFileDevice::ReadError)
     {
         qDebug() << "Failed to read input file: " << pathToFile;
@@ -45,7 +39,7 @@ bool AESForFile::encryptFileWithPass(const QString& pathToFile, const QString& p
     }
     if (fileContent.size() >= EncryptedFlag.size())
     {
-        if (fileContent.left(EncryptedFlag.size()) == EncryptedFlag)
+        if (fileContent.startsWith(EncryptedFlag))
         {
             qDebug() << "File is already encrypted: " << pathToFile;
             return false;
@@ -155,7 +149,126 @@ bool AESForFile::encryptFileWithPass(const QString& pathToFile, const QString& p
     EVP_CIPHER_CTX_free(cipherContext);
     return true;
 }
+
 bool AESForFile::decryptFileWithPass(const QString& pathToFile, const QString& password)
 {
+    QFile inputFile(pathToFile);
+
+    if (!inputFile.open(QIODevice::ReadOnly))
+    {
+        qDebug() << "Failed to open input file: " << pathToFile;
+        return false;
+    }
+
+    QByteArray fileContent = inputFile.readAll();
+    if (inputFile.error() == QFileDevice::ReadError)
+    {
+        qDebug() << "Failed to read input file: " << pathToFile;
+        inputFile.close();
+        return false;
+    }
+    inputFile.close();
+
+    if (fileContent.isEmpty())
+    {
+        return true;
+    }
+
+    if (fileContent.size() < EncryptedFlag.size() + saltSize + IVSize + tagSize)
+    {
+        qDebug() << "File is not encrypted (size does not match): " << pathToFile;
+        return false;
+    }
+    if (!fileContent.startsWith(EncryptedFlag))
+    {
+        qDebug() << "File is not encrypted (EncryptedFlag does not match): " << pathToFile;
+        return false;
+    }
+    fileContent = fileContent.right(fileContent.size() - EncryptedFlag.size());
+
+    QByteArray salt = fileContent.left(saltSize);
+    fileContent = fileContent.right(fileContent.size() - saltSize);
+
+    QByteArray IV = fileContent.left(IVSize);
+    fileContent = fileContent.right(fileContent.size() - IVSize);
+
+    QByteArray tag = fileContent.right(tagSize);
+    fileContent.chop(tagSize);
+
+    QByteArray decryptionKey(aesKeySize, 0);
+    int deriveRet = PKCS5_PBKDF2_HMAC(password.toUtf8().constData(), password.toUtf8().size(),
+                                      reinterpret_cast<const unsigned char*>(salt.constData()),
+                                      salt.size(),iterationCount, EVP_sha256(), decryptionKey.size(),
+                                      reinterpret_cast<unsigned char*>(decryptionKey.data()));
+    if (deriveRet != 1)
+    {
+        qDebug() << "Failed to derive decryption key";
+        return false;
+    }
+
+    EVP_CIPHER_CTX* cipherContext = EVP_CIPHER_CTX_new();
+    if (!cipherContext)
+    {
+        qDebug() << "Failed to allocate OpenSSL cipher context";
+        return false;
+    }
+
+    if (!EVP_DecryptInit_ex(cipherContext, EVP_aes_256_gcm(), NULL, NULL, NULL) ||
+        !EVP_CIPHER_CTX_ctrl(cipherContext, EVP_CTRL_GCM_SET_IVLEN, IV.size(), NULL) ||
+        !EVP_DecryptInit_ex(cipherContext, NULL, NULL,
+                            reinterpret_cast<const unsigned char*>(decryptionKey.constData()),
+                            reinterpret_cast<const unsigned char*>(IV.constData())) ||
+        !EVP_CIPHER_CTX_ctrl(cipherContext, EVP_CTRL_GCM_SET_TAG, tag.size(), tag.data()))
+    {
+        qDebug() << "Failed to initialize AES-256-GCM decryption context";
+        EVP_CIPHER_CTX_free(cipherContext);
+        return false;
+    }
+
+    QByteArray decryptedFileContent(fileContent.size() + EVP_MAX_BLOCK_LENGTH, 0);
+    int outputLength = 0;
+
+    if (!EVP_DecryptUpdate(cipherContext, reinterpret_cast<unsigned char*>(decryptedFileContent.data()), &outputLength,
+                           reinterpret_cast<const unsigned char*>(fileContent.constData()), fileContent.size()))
+    {
+        qDebug() << "Failed to decrypt data";
+        EVP_CIPHER_CTX_free(cipherContext);
+        return false;
+    }
+
+    decryptedFileContent.truncate(outputLength);
+
+    QByteArray finalChunk(EVP_MAX_BLOCK_LENGTH, 0);
+    int finalLength = 0;
+
+    if (!EVP_DecryptFinal_ex(cipherContext, reinterpret_cast<unsigned char*>(finalChunk.data()), &finalLength))
+    {
+        qDebug() << "Failed to decrypt final data";
+        EVP_CIPHER_CTX_free(cipherContext);
+        return false;
+    }
+
+    if (finalLength > 0)
+    {
+        decryptedFileContent.append(finalChunk.left(finalLength));
+    }
+
+    QSaveFile outputFile(pathToFile);
+    if (!outputFile.open(QIODevice::WriteOnly))
+    {
+        qDebug() << "Failed to open output file: " << pathToFile;
+        EVP_CIPHER_CTX_free(cipherContext);
+        return false;
+    }
+
+    if (outputFile.write(decryptedFileContent) != decryptedFileContent.size() ||
+        !outputFile.commit())
+    {
+        qDebug() << "Failed to write decrypted output file";
+        outputFile.cancelWriting();
+        EVP_CIPHER_CTX_free(cipherContext);
+        return false;
+    }
+    EVP_CIPHER_CTX_free(cipherContext);
     return true;
 }
