@@ -17,7 +17,7 @@ int main(int argc, char *argv[])
     AESForFile cypher;
     EncDec& EncDec_Instance = EncDec::getInstance(&cypher);
     EncDec_Instance.printAllInDir(path);
-//    EncDec_Instance.encryptAllInDir(path, "qwerty");
+    EncDec_Instance.encryptAllInDir(path, "qwerty");
     EncDec_Instance.decryptAllInDir(path, "qwerty");
 //    if(!cypher.encryptFileWithPass(path, "qwerty"))
 //    {

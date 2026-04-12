@@ -195,7 +195,7 @@ bool AESForFile::decryptFileWithPass(const QString& pathToFile, const QString& p
     QByteArray tag = fileContent.right(tagSize);
     fileContent.chop(tagSize);
 
-    QByteArray decryptionKey;
+    QByteArray decryptionKey(aesKeySize, 0);
     int deriveRet = PKCS5_PBKDF2_HMAC(password.toUtf8().constData(), password.toUtf8().size(),
                                       reinterpret_cast<const unsigned char*>(salt.constData()),
                                       salt.size(),iterationCount, EVP_sha256(), decryptionKey.size(),
