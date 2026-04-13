@@ -19,11 +19,6 @@ int main(int argc, char *argv[])
     EncDec_Instance.printAllInDir(path);
     EncDec_Instance.encryptAllInDir(path, "qwerty");
     EncDec_Instance.decryptAllInDir(path, "qwerty");
-//    if(!cypher.encryptFileWithPass(path, "qwerty"))
-//    {
-//        out << "Error" << Qt::flush;
-//        return 1;
-//    }
 
     return 0;
     //return a.exec();
