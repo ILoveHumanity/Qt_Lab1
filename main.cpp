@@ -15,7 +15,8 @@ int main(int argc, char *argv[])
 //    path = "C:/repos/RSZI/Lab1/test";
 
     AESForFile cypher;
-    EncDec& EncDec_Instance = EncDec::getInstance(&cypher);
+    EncDec& EncDec_Instance = EncDec::getInstance();
+    EncDec_Instance.setCypher(&cypher);
     EncDec_Instance.printAllInDir(path);
     EncDec_Instance.encryptAllInDir(path, "qwerty");
     EncDec_Instance.decryptAllInDir(path, "qwerty");

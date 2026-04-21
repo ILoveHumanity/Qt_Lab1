@@ -9,10 +9,9 @@ EncDec::EncDec() : cypher_(nullptr)
 {
 }
 
-EncDec& EncDec::getInstance(ICypherMetod* cypher)
+EncDec& EncDec::getInstance()
 {
     static EncDec s;
-    s.setCypher(cypher);
     return s;
 }
 void EncDec::setCypher(ICypherMetod* cypher)

@@ -12,9 +12,8 @@ public:
     ~EncDec() = default;
 
     /// @brief Метод для получения доступа к единственному экземпляру
-    /// @param[in] cypher Указатель на реализацию шифрования
     /// @return Ссылка на экземпляр EncDec
-    static EncDec& getInstance(ICypherMetod* cypher);
+    static EncDec& getInstance();
 
     /// @brief Установить реализацию шифрования
     /// @param[in] cypher Указатель на реализацию шифрования
