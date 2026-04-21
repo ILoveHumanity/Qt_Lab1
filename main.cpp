@@ -10,9 +10,9 @@ int main(int argc, char *argv[])
     QString path;
     QTextStream in(stdin);
     QTextStream out(stdout);
-//    out << "Enter path: " << Qt::flush;
-//    path = in.readLine();
-    path = "C:/repos/RSZI/Lab1/test";
+    out << "Enter path: " << Qt::flush;
+    path = in.readLine();
+//    path = "C:/repos/RSZI/Lab1/test";
 
     AESForFile cypher;
     EncDec& EncDec_Instance = EncDec::getInstance(&cypher);

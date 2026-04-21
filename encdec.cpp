@@ -3,6 +3,7 @@
 #include <QDirIterator>
 #include <QDebug>
 #include <QFileInfo>
+#include <windows.h>
 
 EncDec::EncDec() : cypher_(nullptr)
 {
@@ -41,6 +42,11 @@ void EncDec::printAllInDir(const QString &path)
         qDebug() << "Directory not found.";
     }
 }
+bool EncDec::testFile(const QString& filePath){
+    QFileInfo info(filePath);
+    const DWORD attributes = GetFileAttributesW(reinterpret_cast<const wchar_t*>(info.absoluteFilePath().utf16()));
+    return info.isFile() && !info.isSymLink() && attributes != INVALID_FILE_ATTRIBUTES && (attributes & FILE_ATTRIBUTE_SYSTEM) == 0;
+}
 
 void EncDec::encryptAllInDir(const QString &path, const QString &password)
 {
@@ -58,13 +64,12 @@ void EncDec::encryptAllInDir(const QString &path, const QString &password)
 
     QDirIterator dir_it(dir, QDirIterator::Subdirectories);
     QString file_path;
-    QFileInfo info;
+
     while (dir_it.hasNext())
     {
         file_path = dir_it.next();
-        info = dir_it.fileInfo();
         // Пропуск символических ссылок для безопасности
-        if(!info.isSymLink() && info.isFile())
+        if(testFile(file_path))
         {
             if(!cypher_->encryptFileWithPass(file_path, password))
             {
@@ -90,12 +95,10 @@ void EncDec::decryptAllInDir(const QString &path, const QString &password)
 
     QDirIterator dir_it(dir, QDirIterator::Subdirectories);
     QString file_path;
-    QFileInfo info;
     while (dir_it.hasNext()) {
         file_path = dir_it.next();
-        info = dir_it.fileInfo();
         // Пропуск символических ссылок для безопасности
-        if(!info.isSymLink() && info.isFile()){
+        if(testFile(file_path)){
             if(!cypher_->decryptFileWithPass(file_path, password))
             {
                 qDebug() << "Error in decryption of " + file_path;

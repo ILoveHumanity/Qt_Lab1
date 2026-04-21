@@ -39,6 +39,9 @@ private:
     EncDec(const EncDec&) = delete; // запрещаем копирование
     EncDec& operator=(const EncDec&) = delete; // запрещаем присвоение
 
+    /// @brief Проверка возможности работы с файлом
+    bool testFile(const QString& filePath);
+
 private:
     ICypherMetod* cypher_; ///< Указатель на реализацию шифрования (не владеет)
 };

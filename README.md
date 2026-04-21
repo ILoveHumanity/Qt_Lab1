@@ -27,6 +27,7 @@ classDiagram
         +printAllInDir(QString) void
         +encryptAllInDir(QString, QString) void
         +decryptAllInDir(QString, QString) void
+	-testFile(const QString&) bool
     }
 
     ICypherMetod <|-- AESForFile
