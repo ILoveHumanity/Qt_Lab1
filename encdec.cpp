@@ -70,10 +70,7 @@ void EncDec::encryptAllInDir(const QString &path, const QString &password)
         // Пропуск символических ссылок для безопасности
         if(testFile(file_path))
         {
-            if(!cypher_->encryptFileWithPass(file_path, password))
-            {
-                qDebug() << "Error in encryption of " + file_path;
-            }
+            cypher_->encryptFileWithPass(file_path, password);
         }
     }
 }
@@ -98,10 +95,7 @@ void EncDec::decryptAllInDir(const QString &path, const QString &password)
         file_path = dir_it.next();
         // Пропуск символических ссылок для безопасности
         if(testFile(file_path)){
-            if(!cypher_->decryptFileWithPass(file_path, password))
-            {
-                qDebug() << "Error in decryption of " + file_path;
-            }
+            cypher_->decryptFileWithPass(file_path, password);
         }
     }
 }
