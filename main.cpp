@@ -24,6 +24,12 @@ int main(int argc, char *argv[])
 
     out << "Enter password: " << Qt::flush;
     QString password = in.readLine();
+    while (password.size() > 20)
+    {
+        out << "Password size must be less than or equal to 20.\nEnter password: " << Qt::flush;
+        password = in.readLine();
+    }
+
 
     AESForFile cypher;
     EncDec& EncDec_Instance = EncDec::getInstance();

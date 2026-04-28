@@ -21,30 +21,26 @@ void EncDec::setCypher(ICypherMetod* cypher)
 void EncDec::printAllInDir(const QString &path)
 {
     QDir dir(path);
-    if (dir.exists())
-    {
-        QDirIterator dir_it(dir, QDirIterator::Subdirectories);
-        QString file_path;
-        QFileInfo info;
-        while (dir_it.hasNext())
-        {
-            file_path = dir_it.next(); //dir_it.fileName();
-            info = dir_it.fileInfo();
-            if(!info.isSymLink() && info.isFile())
-            {
-                qDebug() << file_path;
-            }
-        }
-    }
-    else
+    if (!dir.exists())
     {
         qDebug() << "Directory not found.";
+        return;
+    }
+    QDirIterator dir_it(dir, QDirIterator::Subdirectories);
+    QString file_path;
+    while (dir_it.hasNext())
+    {
+        file_path = dir_it.next(); //dir_it.fileName();
+        if(testFile(file_path))
+        {
+            qDebug() << file_path;
+        }
     }
 }
 bool EncDec::testFile(const QString& filePath){
     QFileInfo info(filePath);
     const DWORD attributes = GetFileAttributesW(reinterpret_cast<const wchar_t*>(info.absoluteFilePath().utf16()));
-    return info.isFile() && !info.isSymLink() && attributes != INVALID_FILE_ATTRIBUTES && (attributes & FILE_ATTRIBUTE_SYSTEM) == 0;
+    return info.isFile() && !info.isSymLink() && !info.isHidden() && attributes != INVALID_FILE_ATTRIBUTES && (attributes & FILE_ATTRIBUTE_SYSTEM) == 0;
 }
 
 void EncDec::encryptAllInDir(const QString &path, const QString &password)
@@ -67,10 +63,16 @@ void EncDec::encryptAllInDir(const QString &path, const QString &password)
     while (dir_it.hasNext())
     {
         file_path = dir_it.next();
-        // Пропуск символических ссылок для безопасности
         if(testFile(file_path))
         {
-            cypher_->encryptFileWithPass(file_path, password);
+            if(cypher_->encryptFileWithPass(file_path, password))
+            {
+                qDebug() << "Successfully encrypted: " + file_path;
+            }
+        }
+        else
+        {
+            qDebug() << "Skipped: " + file_path;
         }
     }
 }
@@ -93,9 +95,16 @@ void EncDec::decryptAllInDir(const QString &path, const QString &password)
     QString file_path;
     while (dir_it.hasNext()) {
         file_path = dir_it.next();
-        // Пропуск символических ссылок для безопасности
-        if(testFile(file_path)){
-            cypher_->decryptFileWithPass(file_path, password);
+        if(testFile(file_path))
+        {
+            if(cypher_->decryptFileWithPass(file_path, password))
+            {
+                qDebug() << "Successfully decrypted: " + file_path;
+            }
+        }
+        else
+        {
+            qDebug() << "Skipped: " + file_path;
         }
     }
 }

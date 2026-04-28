@@ -158,7 +158,6 @@ bool AESForFile::encryptFileWithPass(const QString& pathToFile, const QString& p
         return false;
     }
     EVP_CIPHER_CTX_free(cipherContext);
-    qDebug() << "Successfully encrypted: " + pathToFile;
     return true;
 }
 
@@ -291,6 +290,5 @@ bool AESForFile::decryptFileWithPass(const QString& pathToFile, const QString& p
         return false;
     }
     EVP_CIPHER_CTX_free(cipherContext);
-    qDebug() << "Successfully decrypted: " + pathToFile;
     return true;
 }

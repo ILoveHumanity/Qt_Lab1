@@ -4,6 +4,8 @@
 > **Селезнев Илья Дмитриевич** группа 932223
 
 ## Постановка задачи
+Реализовать защиту данных пользовательских папок и файлов, находящихся в папке, а также подпапках путем шифрования. 
+Для доступа к данным исходной папке необходимо выполнить дешифрование.
 
 ## Решение
 ### UML-диаграмма классов
@@ -11,12 +13,12 @@
 classDiagram
     class ICypherMetod {
         <<interface>>
-        +encryptFileWithPass(QString, QString) bool*
-        +decryptFileWithPass(QString, QString) bool*
+        +encryptFileWithPass(const QString&, const QString&) bool*
+        +decryptFileWithPass(const QString&, const QString&) bool*
     }
     class AESForFile {
-        +encryptFileWithPass(QString, QString) bool
-        +decryptFileWithPass(QString, QString) bool
+        +encryptFileWithPass(const QString&, const QString&) bool
+        +decryptFileWithPass(const QString&, const QString&) bool
     }
 
     class EncDec {
@@ -24,14 +26,14 @@ classDiagram
         -EncDec()
         +static getInstance(ICypherMetod*) EncDec&
         +setCypher(ICypherMetod*) void
-        +printAllInDir(QString) void
-        +encryptAllInDir(QString, QString) void
-        +decryptAllInDir(QString, QString) void
+        +printAllInDir(const QString&) void
+        +encryptAllInDir(const QString&, const QString&) void
+        +decryptAllInDir(const QString&, const QString&) void
 	-testFile(const QString&) bool
     }
 
     ICypherMetod <|-- AESForFile
-    EncDec --> ICypherMetod
+    EncDec o--> ICypherMetod
 ```
 
 ## Тестирование
@@ -75,7 +77,7 @@ classDiagram
     * Шаг 1 - ввести пароль "qwerty"
     * Шаг 2 - запустить программу в режиме encrypt / enc
     * Шаг 3 - ввести пароль "qwerty"
-* Результат: файл в папке будет зашифрован, при повторном шифрования будет ...
+* Результат: файл в папке будет зашифрован, при повторном шифрования будет выведено File is already encrypted ...
 
 
 #### Case №6
@@ -84,7 +86,7 @@ classDiagram
     * Шаг 0 - запустить программу в режиме decrypt / dec
     * Шаг 1 - ввести путь до папки
     * Шаг 2 - ввести пароль "qwerty"
-* Результат: файл в папке не изменился, при дешифровании будет ...
+* Результат: файл в папке не изменился, при дешифровании будет выведено  File is not encrypted ...
 
 #### Case №7
 Проверка корректной работы при не существующей директории
@@ -102,16 +104,11 @@ classDiagram
 * Результат: программа выведет сообщение "Directory not found." и завершит исполнение
 
 #### Case №8
-Проверка пропуска ярлыков на Windows
-* Входные параметры: папка с файлом и ярлыком, режим - encrypt
-    * Шаг 1 - создать ярлык в корне папки
+Проверка пропуска нешифруемых файлов (символических ссылок, системных файлов, скрытых файлов)
+* Входные параметры: папка с разными типами файлов
+    * Шаг 0 - запустить программу в режиме encrypt / enc
+    * Шаг 1 - ввести путь до папки
     * Шаг 2 - ввести пароль "qwerty"
-* Результат: содержимое по ярлыку останется без изменений
+* Результат: нешифруемые файлы были пропущены
 
-#### Case №9
-Проверка пропуска системных файлов
-* Входные параметры: папка с разными типами файлов, режим - encrypt
-    * Шаг 1 - убедиться, что папка содержит текстовые файлы и системные файлы
-    * Шаг 2 - ввести пароль "qwerty"
-* Результат: зашифруются только текстовые файлы, системные файлы пропущены
 

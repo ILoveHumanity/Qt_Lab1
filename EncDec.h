@@ -19,7 +19,8 @@ public:
     /// @param[in] cypher Указатель на реализацию шифрования
     void setCypher(ICypherMetod* cypher);
 
-
+    /// @brief Вывести все файлы подверженные обработке в директории
+    /// @param[in] path Путь к директории
     void printAllInDir(const QString &);
 
     /// @brief Рекурсивно зашифровать все файлы в директории
@@ -39,6 +40,7 @@ private:
     EncDec& operator=(const EncDec&) = delete; // запрещаем присвоение
 
     /// @brief Проверка возможности работы с файлом
+    /// @param[in] path Путь к файлу
     bool testFile(const QString& filePath);
 
 private:
