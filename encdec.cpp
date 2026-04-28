@@ -57,7 +57,7 @@ void EncDec::encryptAllInDir(const QString &path, const QString &password)
         return;
     }
 
-    QDirIterator dir_it(dir, QDirIterator::Subdirectories);
+    QDirIterator dir_it(path, QDir::Files | QDir::NoDotAndDotDot | QDir::Hidden, QDirIterator::Subdirectories);
     QString file_path;
 
     while (dir_it.hasNext())
@@ -91,7 +91,7 @@ void EncDec::decryptAllInDir(const QString &path, const QString &password)
         return;
     }
 
-    QDirIterator dir_it(dir, QDirIterator::Subdirectories);
+    QDirIterator dir_it(path, QDir::Files | QDir::NoDotAndDotDot | QDir::Hidden, QDirIterator::Subdirectories);
     QString file_path;
     while (dir_it.hasNext()) {
         file_path = dir_it.next();
