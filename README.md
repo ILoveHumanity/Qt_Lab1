@@ -13,10 +13,13 @@
 classDiagram
     class ICypherMetod {
         <<interface>>
+	+~ICypherMetod()*
         +encryptFileWithPass(const QString&, const QString&) bool*
         +decryptFileWithPass(const QString&, const QString&) bool*
     }
     class AESForFile {
+	+ICypherMetod()
+	+~ICypherMetod()
         +encryptFileWithPass(const QString&, const QString&) bool
         +decryptFileWithPass(const QString&, const QString&) bool
     }
@@ -32,7 +35,7 @@ classDiagram
 	-testFile(const QString&) bool
     }
 
-    ICypherMetod <|-- AESForFile
+    ICypherMetod <|.. AESForFile
     EncDec o--> ICypherMetod
 ```
 
@@ -110,5 +113,3 @@ classDiagram
     * Шаг 1 - ввести путь до папки
     * Шаг 2 - ввести пароль "qwerty"
 * Результат: нешифруемые файлы были пропущены
-
-
