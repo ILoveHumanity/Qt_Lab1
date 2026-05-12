@@ -20,16 +20,7 @@ int main(int argc, char *argv[])
     QString path;
     out << "Enter path: " << Qt::flush;
     path = in.readLine();
-    //    path = "C:/repos/RSZI/Lab1/test";
-
-    out << "Enter password: " << Qt::flush;
-    QString password = in.readLine();
-    while (password.size() > 20)
-    {
-        out << "Password size must be less than or equal to 20.\nEnter password: " << Qt::flush;
-        password = in.readLine();
-    }
-
+    //    path = "";
 
     AESForFile cypher;
     EncDec& EncDec_Instance = EncDec::getInstance();
@@ -40,9 +31,23 @@ int main(int argc, char *argv[])
         EncDec_Instance.printAllInDir(path);
     }
     else if (command == "encrypt" || command == "enc") {
+        out << "Enter password: " << Qt::flush;
+        QString password = in.readLine();
+        while (password.size() > 20)
+        {
+            out << "Password size must be less than or equal to 20.\nEnter password: " << Qt::flush;
+            password = in.readLine();
+        }
         EncDec_Instance.encryptAllInDir(path, password);
     }
     else if (command == "decrypt" || command == "dec") {
+        out << "Enter password: " << Qt::flush;
+        QString password = in.readLine();
+        while (password.size() > 20)
+        {
+            out << "Password size must be less than or equal to 20.\nEnter password: " << Qt::flush;
+            password = in.readLine();
+        }
         EncDec_Instance.decryptAllInDir(path, password);
     }
     else {
