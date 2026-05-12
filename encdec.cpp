@@ -18,6 +18,13 @@ void EncDec::setCypher(ICypherMetod* cypher)
 {
     cypher_ = cypher;
 }
+
+bool EncDec::testFile(const QString& filePath){
+    QFileInfo info(filePath);
+    const DWORD attributes = GetFileAttributesW(reinterpret_cast<const wchar_t*>(info.absoluteFilePath().utf16()));
+    return info.isFile() && !info.isSymLink() && !info.isHidden() && info.size() != 0 && attributes != INVALID_FILE_ATTRIBUTES && (attributes & FILE_ATTRIBUTE_SYSTEM) == 0;
+}
+
 void EncDec::printAllInDir(const QString &path)
 {
     QDir dir(path);
@@ -26,7 +33,7 @@ void EncDec::printAllInDir(const QString &path)
         qDebug() << "Directory not found.";
         return;
     }
-    QDirIterator dir_it(dir, QDirIterator::Subdirectories);
+    QDirIterator dir_it(path, QDir::Files | QDir::NoDotAndDotDot | QDir::Hidden, QDirIterator::Subdirectories);
     QString file_path;
     while (dir_it.hasNext())
     {
@@ -36,11 +43,6 @@ void EncDec::printAllInDir(const QString &path)
             qDebug() << file_path;
         }
     }
-}
-bool EncDec::testFile(const QString& filePath){
-    QFileInfo info(filePath);
-    const DWORD attributes = GetFileAttributesW(reinterpret_cast<const wchar_t*>(info.absoluteFilePath().utf16()));
-    return info.isFile() && !info.isSymLink() && !info.isHidden() && attributes != INVALID_FILE_ATTRIBUTES && (attributes & FILE_ATTRIBUTE_SYSTEM) == 0;
 }
 
 void EncDec::encryptAllInDir(const QString &path, const QString &password)
