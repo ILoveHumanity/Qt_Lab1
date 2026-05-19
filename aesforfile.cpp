@@ -16,6 +16,12 @@ int iterationCount = 10000; ///< Количество итераций PBKDF2
 int IVSize = 16; ///< Размер вектора инициализации в байтах
 int tagSize = 16; ///< Размер тега аутентификации GCM в байтах
 
+AESForFile& AESForFile::getInstance()
+{
+    static AESForFile s;
+    return s;
+}
+
 bool AESForFile::encryptFileWithPass(const QString& pathToFile, const QString& password)
 {
     // Открытие входного файла для чтения

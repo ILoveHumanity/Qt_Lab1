@@ -13,13 +13,14 @@
 classDiagram
     class ICypherMetod {
         <<interface>>
-	+~ICypherMetod()*
+	    +~ICypherMetod()*
         +encryptFileWithPass(const QString&, const QString&) bool*
         +decryptFileWithPass(const QString&, const QString&) bool*
     }
     class AESForFile {
-	+ICypherMetod()
-	+~ICypherMetod()
+	    +AESForFile()
+	    -~AESForFile()
+        +static getInstance() AESForFile&
         +encryptFileWithPass(const QString&, const QString&) bool
         +decryptFileWithPass(const QString&, const QString&) bool
     }
@@ -27,12 +28,12 @@ classDiagram
     class EncDec {
         -cypher_ : ICypherMetod&#42 
         -EncDec()
-        +static getInstance(ICypherMetod*) EncDec&
+        +static getInstance() EncDec&
         +setCypher(ICypherMetod*) void
         +printAllInDir(const QString&) void
         +encryptAllInDir(const QString&, const QString&) void
         +decryptAllInDir(const QString&, const QString&) void
-	-testFile(const QString&) bool
+	    -testFile(const QString&) bool
     }
 
     ICypherMetod <|.. AESForFile

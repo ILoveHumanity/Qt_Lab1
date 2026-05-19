@@ -22,9 +22,9 @@ int main(int argc, char *argv[])
     path = in.readLine();
     //    path = "";
 
-    AESForFile cypher;
+    AESForFile& cypher_Instance = AESForFile::getInstance();
     EncDec& EncDec_Instance = EncDec::getInstance();
-    EncDec_Instance.setCypher(&cypher);
+    EncDec_Instance.setCypher(&cypher_Instance);
 
     // Выполнение
     if (command == "list" || command == "ls") {
