@@ -7,11 +7,12 @@
 class AESForFile : public ICypherMetod
 {
 public:
-    /// @brief Конструктор по умолчанию
-    AESForFile() = default;
-
     /// @brief Деструктор
     ~AESForFile() = default;
+
+    /// @brief Метод для получения доступа к единственному экземпляру
+    /// @return Ссылка на экземпляр AESForFile
+    static AESForFile& getInstance();
 
     /// @brief Шифрование файла с помощью пароля
     /// @param[in] pathToFile Путь к файлу для шифрования
@@ -24,6 +25,11 @@ public:
     /// @param[in] password Пароль для дешифрования
     /// @return true при успешном дешифровании, false в случае ошибки
     bool decryptFileWithPass(const QString& pathToFile, const QString& password);
+private:
+    /// @brief Приватный конструктор для паттерна Singleton
+    AESForFile() = default;
+    AESForFile(const AESForFile&) = delete; // запрещаем копирование
+    AESForFile& operator=(const AESForFile&) = delete; // запрещаем присвоение
 };
 
 #endif // AESFORFILE_H
