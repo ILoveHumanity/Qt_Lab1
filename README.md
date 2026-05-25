@@ -18,8 +18,8 @@ classDiagram
         +decryptFileWithPass(const QString&, const QString&) bool*
     }
     class AESForFile {
-	    +AESForFile()
-	    -~AESForFile()
+	    -AESForFile()
+	    +~AESForFile()
         +static getInstance() AESForFile&
         +encryptFileWithPass(const QString&, const QString&) bool
         +decryptFileWithPass(const QString&, const QString&) bool
